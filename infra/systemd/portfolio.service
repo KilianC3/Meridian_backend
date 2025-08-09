@@ -1,0 +1,12 @@
+[Unit]
+Description=Meridian Analytics API Service
+After=network.target docker.service
+
+[Service]
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/bin/docker run --env-file /etc/meridian/.env meridian-backend:latest
+ExecStop=/usr/bin/docker stop meridian-backend
+
+[Install]
+WantedBy=multi-user.target
