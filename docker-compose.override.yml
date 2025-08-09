@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  api:
+    image: meridian-backend:latest
+    build: null
+    depends_on: null
+    restart: unless-stopped
+    env_file: /etc/meridian/.env
+    ports:
+      - "8000:8000"
+  postgres: null
+  mongo: null
+  redis: null

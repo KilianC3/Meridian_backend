@@ -6,8 +6,9 @@ from app.services import auth_service
 
 
 def test_authenticate_success() -> None:
-    token = auth_service.authenticate("admin@example.com", "password")
-    assert isinstance(token, str)
+    access, refresh = auth_service.authenticate("admin@example.com", "password")
+    assert isinstance(access, str)
+    assert isinstance(refresh, str)
 
 
 def test_authenticate_failure() -> None:

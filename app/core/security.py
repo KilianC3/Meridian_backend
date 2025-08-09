@@ -1,41 +1,33 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, cast
+from typing import Callable
 
-from jose import JWTError, jwt
-from passlib.hash import argon2
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 
-from app.core.config import settings
+from app.services import auth_service
 
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-def hash_password(password: str) -> str:
-    return cast(str, argon2.hash(password))
-
-
-def verify_password(password: str, hashed: str) -> bool:
-    return cast(bool, argon2.verify(password, hashed))
-
-
-def create_access_token(
-    data: Dict[str, Any], expires_delta: timedelta | None = None
-) -> str:
-    to_encode = data.copy()
-    expire = datetime.utcnow() + (
-        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-    to_encode.update({"exp": expire})
-    return cast(str, jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM))
-
-
-def decode_token(token: str) -> Dict[str, Any]:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> auth_service.User:
     try:
-        return cast(
-            Dict[str, Any],
-            jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM]),
+        payload = auth_service.decode_token(token)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token"
         )
-    except JWTError as exc:
-        raise ValueError("Invalid token") from exc
+    return auth_service.get_user(payload.get("sub"))
+
+
+def require_roles(*roles: str) -> Callable[[auth_service.User], auth_service.User]:
+    def checker(
+        user: auth_service.User = Depends(get_current_user),
+    ) -> auth_service.User:
+        if roles and not set(roles).intersection(user.roles):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="insufficient roles"
+            )
+        return user
+
+    return checker

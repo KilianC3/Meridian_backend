@@ -6,7 +6,6 @@ import time
 from typing import Any, cast
 
 from fastapi import APIRouter, Response, status
-from prometheus_client import REGISTRY, exposition
 
 from app.core.config import settings
 from app.db import mongo, pg
@@ -23,7 +22,7 @@ async def healthz() -> dict[str, str]:
 async def _ping_with_latency(func: Any) -> tuple[bool, float]:
     start = time.perf_counter()
     try:
-        await asyncio.wait_for(func(), timeout=0.2)
+        await asyncio.wait_for(func(), timeout=settings.ping_timeout)
         success = True
     except Exception:
         success = False
@@ -39,9 +38,13 @@ async def readiness(response: Response) -> dict[str, Any]:
         response.headers["X-Cache"] = "HIT"
         return cast(dict[str, Any], json.loads(cached))
 
-    pg_ok, pg_latency = await _ping_with_latency(pg.ping)
-    mongo_ok, mongo_latency = await _ping_with_latency(mongo.ping)
-    redis_ok, redis_latency = await _ping_with_latency(redis_db.ping)
+    pg_task = _ping_with_latency(pg.ping)
+    mongo_task = _ping_with_latency(mongo.ping)
+    redis_task = _ping_with_latency(redis_db.ping)
+    pg_res, mongo_res, redis_res = await asyncio.gather(pg_task, mongo_task, redis_task)
+    pg_ok, pg_latency = pg_res
+    mongo_ok, mongo_latency = mongo_res
+    redis_ok, redis_latency = redis_res
 
     status_ok = pg_ok and mongo_ok and redis_ok
     if not status_ok:
@@ -53,16 +56,10 @@ async def readiness(response: Response) -> dict[str, Any]:
         "mongo": {"ok": mongo_ok, "latency_ms": mongo_latency},
         "redis": {"ok": redis_ok, "latency_ms": redis_latency},
     }
-    await cache.setex("readiness", 5, json.dumps(payload))
+    await cache.setex("readiness", settings.readiness_cache_ttl, json.dumps(payload))
     return payload
 
 
 @router.get("/version")
 async def version() -> dict[str, str]:
     return {"version": settings.version}
-
-
-@router.get("/metrics")
-async def metrics() -> Response:
-    data = exposition.generate_latest(REGISTRY)
-    return Response(content=data, media_type="text/plain")
