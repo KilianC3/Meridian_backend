@@ -36,4 +36,3 @@ def test_invalid_login() -> None:
         data={"username": "admin@example.com", "password": "bad"},
     )
     assert resp.status_code == 401
-

@@ -13,7 +13,7 @@ from app.core.config import settings
 
 
 class JsonFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:  # type: ignore[override]
+    def format(self, record: logging.LogRecord) -> str:
         trace_id = trace.get_current_span().get_span_context().trace_id
         payload: dict[str, Any] = {
             "level": record.levelname,

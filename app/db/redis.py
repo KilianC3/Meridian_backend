@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import asyncio
 
-import redis.asyncio as aioredis
+import redis.asyncio as aioredis  # type: ignore[import-untyped]
 
 from app.core.config import settings
 
 client: aioredis.Redis | None = None
+
+__all__ = ["init_client", "ping", "client", "aioredis"]
 
 
 async def init_client() -> aioredis.Redis:

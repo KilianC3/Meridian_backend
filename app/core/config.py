@@ -6,7 +6,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings):  # type: ignore[misc]
     app_name: str = Field("meridian-backend", alias="APP_NAME")
     env: str = Field("development", alias="ENV")
     version: str = Field("0.1.0", alias="VERSION")
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
 
 
 settings = get_settings()

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import Depends, FastAPI, Request
+from typing import Awaitable, Callable
+
+from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.deps import rate_limit
@@ -38,8 +40,10 @@ app.add_middleware(
 )
 
 
-@app.middleware("http")
-async def security_headers(request: Request, call_next):
+@app.middleware("http")  # type: ignore[misc]
+async def security_headers(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"

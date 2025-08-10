@@ -9,16 +9,20 @@ from app.db import mongo, pg
 from app.db import redis as redis_db
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio  # type: ignore[misc]
 async def test_pg_init_and_ping(monkeypatch: pytest.MonkeyPatch) -> None:
     class FakeConn:
-        async def execute(self, *args, **kwargs):  # noqa: D401, ARG002
+        async def execute(
+            self, *args: object, **kwargs: object
+        ) -> None:  # noqa: D401, ARG002
             return None
 
         async def __aenter__(self) -> "FakeConn":
             return self
 
-        async def __aexit__(self, exc_type, exc, tb) -> None:  # noqa: ARG002
+        async def __aexit__(
+            self, exc_type: object, exc: object, tb: object
+        ) -> None:  # noqa: ARG002
             return None
 
     class FakeEngine:
@@ -34,7 +38,7 @@ async def test_pg_init_and_ping(monkeypatch: pytest.MonkeyPatch) -> None:
     assert await pg.ping()
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio  # type: ignore[misc]
 async def test_mongo_init_and_ping(monkeypatch: pytest.MonkeyPatch) -> None:
     fake_client = AsyncMock()
     fake_client.admin.command.return_value = {"ok": 1}
@@ -45,7 +49,7 @@ async def test_mongo_init_and_ping(monkeypatch: pytest.MonkeyPatch) -> None:
     assert await mongo.ping()
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio  # type: ignore[misc]
 async def test_redis_init_and_ping(monkeypatch: pytest.MonkeyPatch) -> None:
     fake_client = AsyncMock()
     fake_client.ping.return_value = True

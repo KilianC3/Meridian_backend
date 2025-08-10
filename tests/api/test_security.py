@@ -44,11 +44,13 @@ def test_security_headers(redis_client: AsyncMock) -> None:
     assert resp.headers["referrer-policy"] == "same-origin"
 
 
-@patch.dict(os.environ, {"CORS_ORIGINS": "[\"https://allowed.com\"]"})
+@patch.dict(os.environ, {"CORS_ORIGINS": '["https://allowed.com"]'})
 def test_cors_allowlist() -> None:
     import app.core.config as config
+
     reload(config)
     import app.main as main
+
     reload(main)
     with patch(
         "app.api.deps.redis.init_client", new_callable=AsyncMock

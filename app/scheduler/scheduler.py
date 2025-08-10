@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
-import redis.asyncio as aioredis
+import redis.asyncio as aioredis  # type: ignore[import-untyped]
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 

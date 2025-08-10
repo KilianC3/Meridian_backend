@@ -14,7 +14,7 @@ from app.db import redis as redis_db
 router = APIRouter()
 
 
-@router.get("/healthz")
+@router.get("/healthz")  # type: ignore[misc]
 async def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
@@ -30,7 +30,7 @@ async def _ping_with_latency(func: Any) -> tuple[bool, float]:
     return success, latency
 
 
-@router.get("/readiness", status_code=status.HTTP_200_OK)
+@router.get("/readiness", status_code=status.HTTP_200_OK)  # type: ignore[misc]
 async def readiness(response: Response) -> dict[str, Any]:
     cache = await redis_db.init_client()
     cached: str | None = await cache.get("readiness")
@@ -60,6 +60,6 @@ async def readiness(response: Response) -> dict[str, Any]:
     return payload
 
 
-@router.get("/version")
+@router.get("/version")  # type: ignore[misc]
 async def version() -> dict[str, str]:
     return {"version": settings.version}

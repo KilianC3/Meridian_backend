@@ -8,13 +8,13 @@ from app.services import job_service
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 
-@router.get("/")
+@router.get("/")  # type: ignore[misc]
 def list_jobs() -> list[dict[str, str]]:
     sched = scheduler_module.get_scheduler()
     return [{"id": job.id} for job in sched.get_jobs()]
 
 
-@router.post("/{name}")
+@router.post("/{name}")  # type: ignore[misc]
 def create_job(name: str) -> dict[str, str]:
     try:
         func = job_service.get(name)
@@ -25,14 +25,14 @@ def create_job(name: str) -> dict[str, str]:
     return {"status": "scheduled"}
 
 
-@router.delete("/{job_id}")
+@router.delete("/{job_id}")  # type: ignore[misc]
 def delete_job(job_id: str) -> dict[str, str]:
     sched = scheduler_module.get_scheduler()
     sched.remove_job(job_id)
     return {"status": "deleted"}
 
 
-@router.post("/{name}/run")
+@router.post("/{name}/run")  # type: ignore[misc]
 async def run_job(name: str) -> dict[str, str]:
     try:
         func = job_service.get(name)

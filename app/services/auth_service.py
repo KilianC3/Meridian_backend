@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import secrets
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any, Dict, List, cast
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
@@ -25,11 +25,11 @@ class User:
 
 
 def hash_password(password: str) -> str:
-    return argon2.hash(password)
+    return cast(str, argon2.hash(password))
 
 
 def verify_password(password: str, hashed: str) -> bool:
-    return argon2.verify(password, hashed)
+    return cast(bool, argon2.verify(password, hashed))
 
 
 USERS: Dict[str, User] = {
@@ -41,7 +41,7 @@ def _create_token(data: Dict[str, Any], expires_delta: timedelta) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
+    return cast(str, jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM))
 
 
 def create_access_token(data: Dict[str, Any]) -> str:
@@ -54,7 +54,10 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
 
 def decode_token(token: str) -> Dict[str, Any]:
     try:
-        return jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
+        return cast(
+            Dict[str, Any],
+            jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM]),
+        )
     except JWTError as exc:
         raise ValueError("Invalid token") from exc
 
