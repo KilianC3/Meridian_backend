@@ -20,10 +20,8 @@ class FakeRedis:
         self.store[key] = value
 
 
-@patch("app.api.routers.health.redis_db.init_client", new_callable=AsyncMock)
-@patch(
-    "app.api.routers.health.redis_db.ping", new_callable=AsyncMock, return_value=True
-)
+@patch("app.db.redis.init_client", new_callable=AsyncMock)
+@patch("app.db.redis.ping", new_callable=AsyncMock, return_value=True)
 @patch("app.api.routers.health.mongo.ping", new_callable=AsyncMock, return_value=True)
 @patch("app.api.routers.health.pg.ping", new_callable=AsyncMock, return_value=True)
 def test_readiness_ok(
@@ -49,3 +47,21 @@ def test_version() -> None:
     response = client.get("/version")
     assert response.status_code == 200
     assert "version" in response.json()
+
+
+@patch("app.db.redis.init_client", new_callable=AsyncMock)
+@patch("app.db.redis.ping", side_effect=Exception("fail"))
+@patch("app.api.routers.health.mongo.ping", new_callable=AsyncMock, return_value=True)
+@patch("app.api.routers.health.pg.ping", new_callable=AsyncMock, return_value=True)
+def test_readiness_unhealthy(
+    pg_ping: AsyncMock,
+    mongo_ping: AsyncMock,
+    redis_ping: AsyncMock,
+    redis_client: AsyncMock,
+) -> None:  # noqa: ARG001
+    redis_client.return_value = FakeRedis()
+    response = client.get("/readiness")
+    assert response.status_code == 503
+    data = response.json()
+    assert data["status"] == "error"
+    assert data["redis"]["ok"] is False

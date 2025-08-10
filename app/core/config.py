@@ -6,7 +6,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings):  # type: ignore[misc]
     app_name: str = Field("meridian-backend", alias="APP_NAME")
     env: str = Field("development", alias="ENV")
     version: str = Field("0.1.0", alias="VERSION")
@@ -16,13 +16,17 @@ class Settings(BaseSettings):
     secret_key: str = Field(..., alias="SECRET_KEY")
     sentry_dsn: str | None = Field(None, alias="SENTRY_DSN")
 
+    ping_timeout: float = Field(0.2, alias="PING_TIMEOUT")
+    readiness_cache_ttl: int = Field(5, alias="READINESS_CACHE_TTL")
+    cors_origins: list[str] = Field(default=["*"], alias="CORS_ORIGINS")
+
     class Config:
         env_file = ".env"
 
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()  # type: ignore[call-arg]
+    return Settings()
 
 
 settings = get_settings()

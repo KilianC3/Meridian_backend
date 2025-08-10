@@ -1,13 +1,20 @@
 from __future__ import annotations
 
-from typing import Callable, Dict
+from typing import Awaitable, Callable, Dict, List
 
-JOB_REGISTRY: Dict[str, Callable[[], None]] = {}
+from app.scheduler.jobs import datasource_check, heartbeat
+
+JobFunc = Callable[[], Awaitable[None]]
+
+REGISTRY: Dict[str, JobFunc] = {
+    "heartbeat": heartbeat.run,
+    "datasource_check": datasource_check.run,
+}
 
 
-def register_job(name: str, func: Callable[[], None]) -> None:
-    JOB_REGISTRY[name] = func
+def get(name: str) -> JobFunc:
+    return REGISTRY[name]
 
 
-def list_jobs() -> Dict[str, Callable[[], None]]:
-    return JOB_REGISTRY
+def list_jobs() -> List[str]:
+    return list(REGISTRY.keys())

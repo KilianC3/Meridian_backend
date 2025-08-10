@@ -1,0 +1,14 @@
+[Unit]
+Description=Meridian Backend API
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/opt/meridian
+ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.override.yml up
+ExecStop=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.override.yml down
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -10,7 +10,7 @@ from app.db import redis as redis_db
 router = APIRouter(prefix="/datasources", tags=["datasources"])
 
 
-@router.get("/status")
+@router.get("/status")  # type: ignore[misc]
 async def datasource_status() -> dict[str, bool]:
     pg_ok, mongo_ok, redis_ok = await asyncio.gather(
         pg.ping(), mongo.ping(), redis_db.ping()

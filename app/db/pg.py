@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import asyncio
+from pathlib import Path
 from typing import AsyncGenerator
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -33,10 +37,18 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def ping() -> bool:
-    try:
-        eng = await init_engine()
-        async with eng.connect() as conn:
-            await conn.execute(text("SELECT 1"))
-        return True
-    except Exception:
-        return False
+    for _ in range(3):
+        try:
+            eng = await init_engine()
+            async with eng.connect() as conn:
+                await conn.execute(text("SELECT 1"))
+            return True
+        except Exception:
+            await asyncio.sleep(0.1)
+    return False
+
+
+def run_migrations() -> None:
+    cfg = Config(str(Path(__file__).parent / "migrations" / "alembic.ini"))
+    cfg.set_main_option("sqlalchemy.url", settings.postgres_dsn)
+    command.upgrade(cfg, "head")
