@@ -62,4 +62,8 @@ async def readiness(response: Response) -> dict[str, Any]:
 
 @router.get("/version")  # type: ignore[misc]
 async def version() -> dict[str, str]:
-    return {"version": settings.version}
+    return {
+        "version": settings.version,
+        "git_sha": settings.git_sha,
+        "build_time": settings.build_time,
+    }

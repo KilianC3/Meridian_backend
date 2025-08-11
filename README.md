@@ -46,6 +46,8 @@ Configuration is read from `/etc/meridian/.env`.
 | `APP_NAME` | Application name used for logging |
 | `ENV` | Environment identifier (`development`, `production`, etc.) |
 | `VERSION` | Application version string |
+| `GIT_SHA` | Git commit SHA for the build |
+| `BUILD_TIME` | ISO8601 timestamp when the build was created |
 | `POSTGRES_DSN` | PostgreSQL connection string |
 | `MONGO_DSN` | MongoDB connection string |
 | `REDIS_DSN` | Redis connection string |
