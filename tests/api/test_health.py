@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
+from app.core.config import settings
 from app.main import app
 
 client = TestClient(app)
@@ -46,7 +47,11 @@ def test_healthz() -> None:
 def test_version() -> None:
     response = client.get("/version")
     assert response.status_code == 200
-    assert "version" in response.json()
+    assert response.json() == {
+        "version": settings.version,
+        "git_sha": settings.git_sha,
+        "build_time": settings.build_time,
+    }
 
 
 @patch("app.db.redis.init_client", new_callable=AsyncMock)

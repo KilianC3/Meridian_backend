@@ -10,6 +10,8 @@ class Settings(BaseSettings):  # type: ignore[misc]
     app_name: str = Field("meridian-backend", alias="APP_NAME")
     env: str = Field("development", alias="ENV")
     version: str = Field("0.1.0", alias="VERSION")
+    git_sha: str = Field("unknown", alias="GIT_SHA")
+    build_time: str = Field("unknown", alias="BUILD_TIME")
     postgres_dsn: str = Field(..., alias="POSTGRES_DSN")
     mongo_dsn: str = Field(..., alias="MONGO_DSN")
     redis_dsn: str = Field(..., alias="REDIS_DSN")
