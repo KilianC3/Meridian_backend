@@ -1,0 +1,43 @@
+[
+  {
+    "statement_id": "7ed6cde717d5aa87ba6bf40fbcb9b4ee",
+    "central_bank": "Fed",
+    "published_at": "2024-01-01T00:00:00Z",
+    "type": "statement",
+    "title": "FOMC Statement",
+    "url": "http://fed.example/statement",
+    "text_excerpt": "Fed statement",
+    "hawkish_dovish_score": null,
+    "next_meeting_date": null,
+    "raw": {
+      "source": "fed",
+      "title": "FOMC Statement",
+      "url": "http://fed.example/statement",
+      "published_at": "2024-01-01T00:00:00Z",
+      "summary": "Fed statement"
+    }
+  },
+  {
+    "event_id": "federal_register:123",
+    "jurisdiction": "US",
+    "source": "federal_register",
+    "source_id": "123",
+    "published_at": "2024-01-02",
+    "title": "New Rule",
+    "summary": "Summary",
+    "url": "http://fr.gov/123",
+    "topics": null,
+    "affected_countries": null,
+    "affected_sectors": null,
+    "affected_entities": null,
+    "severity": null,
+    "raw": {
+      "source": "federal_register",
+      "id": "123",
+      "title": "New Rule",
+      "summary": "Summary",
+      "published_at": "2024-01-02",
+      "url": "http://fr.gov/123"
+    }
+  }
+]

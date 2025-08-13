@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import asyncio
 
-import redis.asyncio as aioredis  # type: ignore[import-untyped]
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from redis.asyncio.lock import Lock  # type: ignore[import-untyped]
 
 from app.core.config import settings
 from app.db import redis as redis_db
 
 scheduler: AsyncIOScheduler | None = None
-lock: aioredis.Lock | None = None
+lock: Lock | None = None
 
 
 def get_scheduler() -> AsyncIOScheduler:
@@ -27,7 +27,7 @@ def start() -> None:
     sched = get_scheduler()
     loop = asyncio.get_event_loop()
 
-    async def acquire_lock() -> aioredis.Lock | None:
+    async def acquire_lock() -> Lock | None:
         client = await redis_db.init_client()
         lk = client.lock("scheduler_lock", timeout=60)
         if await lk.acquire(blocking=False):

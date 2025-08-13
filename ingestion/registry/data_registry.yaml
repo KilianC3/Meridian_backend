@@ -1,0 +1,258 @@
+datasets:
+  fed_rss:
+    enabled: true
+    adapter: rss
+    url: https://www.federalreserve.gov/feeds/press_all.xml
+    cadence: hourly
+    target_table: cb_statements
+    conflict_keys: [statement_id]
+    mapper: policy.map_cb_statement
+
+  ecb_rss:
+    enabled: true
+    adapter: rss
+    url: https://www.ecb.europa.eu/rss/press.html
+    cadence: hourly
+    target_table: cb_statements
+    conflict_keys: [statement_id]
+    mapper: policy.map_cb_statement
+
+  boe_rss:
+    enabled: true
+    adapter: rss
+    url: https://www.bankofengland.co.uk/rss
+    cadence: hourly
+    target_table: cb_statements
+    conflict_keys: [statement_id]
+    mapper: policy.map_cb_statement
+
+  federal_register:
+    enabled: true
+    adapter: rest_json
+    url: https://api.federalregister.gov/v1/documents.json
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_policy_event
+
+  eur_lex:
+    enabled: true
+    adapter: rss
+    url: https://eur-lex.europa.eu/rss/en/index.html
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_policy_event
+
+  uk_legislation:
+    enabled: true
+    adapter: rss
+    url: https://www.legislation.gov.uk/updates
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_policy_event
+
+  sanctions_updates:
+    enabled: true
+    adapter: file_scraper
+    url: https://www.treasury.gov/ofac/downloads/sdn.csv
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_sanction_update
+
+  bis_entity_list:
+    enabled: true
+    adapter: file_scraper
+    url: https://www.bis.doc.gov/enforcement/entity-list
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_bis_entity
+
+  world_bank:
+    enabled: true
+    adapter: rest_json
+    url: https://api.worldbank.org/v2/country/{ISO3}/indicator/{IND}?format=json
+    cadence: monthly
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_world_bank
+
+  imf_weo:
+    enabled: true
+    adapter: rest_json
+    url: https://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/WEO
+    cadence: monthly
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_imf_weo
+
+  imf_ifs:
+    enabled: true
+    adapter: rest_json
+    url: https://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData/IFS
+    cadence: monthly
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_imf_ifs
+
+  fred_rates:
+    enabled: true
+    adapter: rest_json
+    url: https://api.stlouisfed.org/fred/series/observations
+    cadence: daily
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_fred_series
+
+  comtrade:
+    enabled: true
+    adapter: rest_json
+    url: https://comtradeapi.worldbank.org/v1/get
+    cadence: monthly
+    target_table: trade_flows
+    conflict_keys:
+      - reporter_iso2
+      - partner_iso2
+      - hs_code
+      - flow
+      - period
+    mapper: logistics.map_trade_flow
+
+  gdelt_transport:
+    enabled: true
+    adapter: rest_json
+    url: https://api.gdeltproject.org/api/v2/events/doc/doc?query=transport
+    cadence: hourly
+    target_table: geo_events
+    conflict_keys: [source, source_id]
+    mapper: geopolitics.map_gdelt_event
+
+  aisstream:
+    enabled: true
+    adapter: websocket
+    url: wss://stream.aisstream.io/v0
+    cadence: 15m
+    target_table: ais_raw
+    conflict_keys: [msg_id]
+    mapper: logistics.map_ais_raw
+
+  gdelt_events:
+    enabled: true
+    adapter: rest_json
+    url: https://api.gdeltproject.org/api/v2/events/doc/doc
+    cadence: hourly
+    target_table: geo_events
+    conflict_keys: [source, source_id]
+    mapper: geopolitics.map_gdelt_event
+
+  gdelt_mentions:
+    enabled: true
+    adapter: rest_json
+    url: https://api.gdeltproject.org/api/v2/doc/doc
+    cadence: hourly
+    target_table: geo_mentions
+    conflict_keys: [source, source_id]
+    mapper: geopolitics.map_gdelt_mention
+
+  reliefweb:
+    enabled: true
+    adapter: rest_json
+    url: https://api.reliefweb.int/v1/disasters
+    cadence: daily
+    target_table: geo_events
+    conflict_keys: [source, source_id]
+    mapper: geopolitics.map_relief_event
+
+  eia:
+    enabled: true
+    adapter: rest_json
+    url: https://api.eia.gov/series/
+    cadence: daily
+    target_table: commodities_ts
+    conflict_keys: [commodity_code, ts]
+    mapper: commodities.map_eia_series
+
+  fred_commodities:
+    enabled: true
+    adapter: rest_json
+    url: https://api.stlouisfed.org/fred/series/observations
+    cadence: daily
+    target_table: commodities_ts
+    conflict_keys: [commodity_code, ts]
+    mapper: commodities.map_fred_commodity
+
+  bdi_scrape:
+    enabled: true
+    adapter: file_scraper
+    url: https://www.balticexchange.com/api/bdi.csv
+    cadence: daily
+    target_table: freight_indices
+    conflict_keys: [index_code, ts]
+    mapper: commodities.map_bdi
+
+  sec_tickers:
+    enabled: true
+    adapter: rest_json
+    url: https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json
+    cadence: daily
+    target_table: ref_company_tickers
+    conflict_keys: [cik]
+    mapper: markets.map_sec_tickers
+
+  sec_filings_index:
+    enabled: true
+    adapter: rest_json
+    url: https://data.sec.gov/submissions/CIK0000320193.json
+    cadence: daily
+    target_table: filings_index
+    conflict_keys: [accession]
+    mapper: markets.map_sec_filings
+
+  sec_fundamentals:
+    enabled: true
+    adapter: rest_json
+    url: https://data.sec.gov/api/xbrl/companyconcept/CIK0000320193/us-gaap/Assets.json
+    cadence: daily
+    target_table: fundamentals_xbrl
+    conflict_keys: [fact_id]
+    mapper: markets.map_sec_fundamentals
+
+  sec_earnings:
+    enabled: true
+    adapter: rest_json
+    url: https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json
+    cadence: daily
+    target_table: earnings_events
+    conflict_keys: [event_id]
+    mapper: markets.map_sec_earnings
+
+  yfinance_prices:
+    enabled: true
+    adapter: rest_json
+    url: https://query1.finance.yahoo.com/v7/finance/download
+    cadence: daily
+    target_table: prices_eod
+    conflict_keys: [symbol, ts]
+    mapper: markets.map_yfinance_price
+
+  yfinance_indices:
+    enabled: true
+    adapter: rest_json
+    url: https://query1.finance.yahoo.com/v7/finance/download
+    cadence: daily
+    target_table: indices_eod
+    conflict_keys: [index_symbol, ts]
+    mapper: markets.map_yfinance_index
+
+  cboe_vix_csv:
+    enabled: true
+    adapter: file_scraper
+    url: https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv
+    cadence: daily
+    target_table: indices_eod
+    conflict_keys: [index_symbol, ts]
+    mapper: markets.map_cboe_vix
+
