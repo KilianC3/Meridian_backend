@@ -1,26 +1,36 @@
-.PHONY: fmt lint test up down migrate revision
+# Detect docker compose variant
+DC := $(shell command -v docker-compose >/dev/null 2>&1 && echo docker-compose || echo docker compose)
 
-fmt:
-	pre-commit run --files $(shell git ls-files '*.py') --show-diff-on-failure || true
-	black app tests
-	isort app tests
-	ruff check --fix app tests
-
-lint:
-	ruff check app tests
-	mypy app
-
-test:
-	pytest
+.PHONY: up down fmt lint type test migrate migrate-local migrate-dc
 
 up:
-	docker-compose up --build
+	$(DC) up -d
 
 down:
-	docker-compose down -v
+	$(DC) down
 
-migrate:
-	alembic upgrade head
+fmt:
+	poetry run pre-commit run --all-files
 
-revision:
-	alembic revision --autogenerate -m "$(m)"
+lint:
+	poetry run ruff check .
+	poetry run bandit -r app || true
+	poetry run mypy app
+
+type:
+	poetry run mypy app
+
+test:
+	poetry run pytest -q
+
+# Try local psql; if missing, run through the postgres container.
+migrate: migrate-local migrate-dc
+
+migrate-local:
+	@command -v psql >/dev/null 2>&1 && \
+	  (psql "$$POSTGRES_DSN" -f sql/001_init.sql && psql "$$POSTGRES_DSN" -f sql/002_indexes.sql) || true
+
+migrate-dc:
+	@command -v psql >/dev/null 2>&1 || \
+	  ($(DC) exec -T postgres psql -U $$POSTGRES_USER -d $$POSTGRES_DB -f /app/sql/001_init.sql && \
+	   $(DC) exec -T postgres psql -U $$POSTGRES_USER -d $$POSTGRES_DB -f /app/sql/002_indexes.sql)

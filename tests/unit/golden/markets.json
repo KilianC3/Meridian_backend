@@ -1,0 +1,24 @@
+[
+  {
+    "series_id": "us_10y_yield",
+    "entity_type": "macro",
+    "entity_id": "macro",
+    "metric": "us_10y_yield",
+    "ts": "2024-01-02",
+    "value": 4.0,
+    "unit": "percent",
+    "source": "fred",
+    "attrs": null
+  },
+  {
+    "series_id": "usd_eur",
+    "entity_type": "macro",
+    "entity_id": "macro",
+    "metric": "usd_eur",
+    "ts": "2024-01-02",
+    "value": 1.1,
+    "unit": "rate",
+    "source": "fred",
+    "attrs": null
+  }
+]
