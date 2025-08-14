@@ -1,0 +1,125 @@
+[
+  {
+    "event_type": "AnchorageQueueEnter",
+    "ts": "2024-01-01T00:00:00Z",
+    "mmsi": "1",
+    "port_id": "PORTA",
+    "chokepoint_id": null,
+    "lat": 0,
+    "lon": 0,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "1:AnchorageQueueEnter:2024-01-01T00:00:00Z"
+  },
+  {
+    "port_id": "PORTA",
+    "vessel_class": "all",
+    "ts": "2024-01-01T00:00:00Z",
+    "queue_length": 1,
+    "avg_wait_hours": null,
+    "throughput_departures": null,
+    "congestion_index": null,
+    "source": "aisstream"
+  },
+  {
+    "event_type": "AnchorageQueueExit",
+    "ts": "2024-01-01T01:00:00Z",
+    "mmsi": "1",
+    "port_id": "PORTA",
+    "chokepoint_id": null,
+    "lat": 0,
+    "lon": 0,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "1:AnchorageQueueExit:2024-01-01T01:00:00Z"
+  },
+  {
+    "port_id": "PORTA",
+    "vessel_class": "all",
+    "ts": "2024-01-01T01:00:00Z",
+    "queue_length": 0,
+    "avg_wait_hours": null,
+    "throughput_departures": null,
+    "congestion_index": null,
+    "source": "aisstream"
+  },
+  {
+    "event_type": "PortCall",
+    "ts": "2024-01-01T01:00:00Z",
+    "mmsi": "1",
+    "port_id": "PORTA",
+    "chokepoint_id": null,
+    "lat": 0,
+    "lon": 0,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "1:PortCall:2024-01-01T01:00:00Z"
+  },
+  {
+    "event_type": "PortDepart",
+    "ts": "2024-01-01T02:00:00Z",
+    "mmsi": "1",
+    "port_id": "PORTA",
+    "chokepoint_id": null,
+    "lat": 0,
+    "lon": 0,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "1:PortDepart:2024-01-01T02:00:00Z"
+  },
+  {
+    "event_type": "DraftChange",
+    "ts": "2024-01-01T02:00:00Z",
+    "mmsi": "1",
+    "port_id": null,
+    "chokepoint_id": null,
+    "lat": 0,
+    "lon": 0,
+    "channel": null,
+    "attrs": {"from": 10, "to": 12},
+    "dedupe_key": "1:DraftChange:2024-01-01T02:00:00Z"
+  },
+  {
+    "event_type": "TransitStart",
+    "ts": "2024-01-01T03:00:00Z",
+    "mmsi": "2",
+    "port_id": null,
+    "chokepoint_id": "SUEZ",
+    "lat": 1,
+    "lon": 1,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "2:TransitStart:2024-01-01T03:00:00Z"
+  },
+  {
+    "chokepoint_id": "SUEZ",
+    "vessel_class": "all",
+    "ts": "2024-01-01T03:00:00Z",
+    "active_transits": 1,
+    "avg_transit_minutes": null,
+    "transit_delay_index": null,
+    "source": "aisstream"
+  },
+  {
+    "event_type": "TransitEnd",
+    "ts": "2024-01-01T04:00:00Z",
+    "mmsi": "2",
+    "port_id": null,
+    "chokepoint_id": "SUEZ",
+    "lat": 1,
+    "lon": 1,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "2:TransitEnd:2024-01-01T04:00:00Z"
+  },
+  {
+    "chokepoint_id": "SUEZ",
+    "vessel_class": "all",
+    "ts": "2024-01-01T04:00:00Z",
+    "active_transits": 0,
+    "avg_transit_minutes": null,
+    "transit_delay_index": null,
+    "source": "aisstream"
+  }
+]
+

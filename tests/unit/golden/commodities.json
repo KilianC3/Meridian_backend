@@ -1,0 +1,24 @@
+[
+  {
+    "commodity_code": "WTI",
+    "series_id": "WTI",
+    "ts": "2024-01-01",
+    "price": 80.0,
+    "unit": "USD/bbl",
+    "source": "eia"
+  },
+  {
+    "commodity_code": "COPPER",
+    "series_id": "COPPER",
+    "ts": "2024-01-01",
+    "price": 9000,
+    "unit": "USD/ton",
+    "source": "fred"
+  },
+  {
+    "index_code": "BDI",
+    "ts": "2024-01-01",
+    "value": 1800,
+    "source": "bdi"
+  }
+]

@@ -1,34 +1,49 @@
 name: CI
-
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+  push:
+    branches: [ main ]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - name: Install pre-commit
-        run: pip install pre-commit
-      - name: Run pre-commit
-        run: pre-commit run --all-files
-
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: meridian
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      POSTGRES_DSN: postgresql://postgres:postgres@localhost:5432/meridian
+      POSTGRES_USER: postgres
+      POSTGRES_DB: meridian
+      FRED_API_KEY: test
+      EIA_API_KEY: test
+      COMTRADE_API_KEY: test
+      AISTREAM_API_KEY: test
+      SEC_UA: "Meridian/CI (ci@example.com)"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - name: Install dependencies
-        run: |
-          pip install .
-          pip install pytest pytest-cov pytest-asyncio
-      - name: Run tests
-        run: pytest
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Install deps
+        run: poetry install --with dev
+      - name: Format
+        run: make fmt
+      - name: Lint & Type Check
+        run: make lint
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Migrate
+        run: make migrate
+      - name: Tests
+        run: make test

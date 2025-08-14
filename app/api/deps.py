@@ -19,7 +19,10 @@ async def rate_limit(request: Request) -> None:
     """Simple Redis-backed rate limiter."""
     try:
         client = await redis.init_client()
-        identifier = request.client.host
+        client_info = request.client
+        if client_info is None or client_info.host is None:
+            return None
+        identifier = client_info.host
         key = f"rl:{identifier}"
         count = await client.incr(key)
         if count == 1:

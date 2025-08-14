@@ -1,0 +1,24 @@
+[
+  {
+    "series_id": "USA_gdp_current_usd",
+    "entity_type": "country",
+    "entity_id": "USA",
+    "metric": "gdp_current_usd",
+    "ts": "2023-01-01",
+    "value": 100,
+    "unit": "USD",
+    "source": "worldbank",
+    "attrs": null
+  },
+  {
+    "series_id": "USA_real_gdp_growth_percent",
+    "entity_type": "country",
+    "entity_id": "USA",
+    "metric": "real_gdp_growth_percent",
+    "ts": "2023-01-01",
+    "value": 1.5,
+    "unit": "percent",
+    "source": "imf",
+    "attrs": null
+  }
+]
