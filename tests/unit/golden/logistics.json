@@ -1,0 +1,26 @@
+[
+  {
+    "reporter_iso2": "US",
+    "partner_iso2": "CN",
+    "hs_code": "0101",
+    "flow": "import",
+    "period": "2024-01-01",
+    "value_usd": 1000,
+    "quantity": 10,
+    "quantity_unit": "kg",
+    "source": "un_comtrade",
+    "meta": {"foo": "bar"}
+  },
+  {
+    "event_type": "transport_disruption",
+    "ts": "2024-01-02",
+    "mmsi": null,
+    "port_id": null,
+    "chokepoint_id": null,
+    "lat": 10.0,
+    "lon": 20.0,
+    "channel": null,
+    "attrs": null,
+    "dedupe_key": "gdelt_transport:2"
+  }
+]

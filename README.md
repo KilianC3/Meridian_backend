@@ -56,6 +56,11 @@ Configuration is read from `/etc/meridian/.env`.
 | `PING_TIMEOUT` | Timeout in seconds for dependency health checks |
 | `READINESS_CACHE_TTL` | TTL in seconds for cached readiness results |
 | `CORS_ORIGINS` | Comma separated list of allowed CORS origins |
+| `FRED_API_KEY` | API key for Federal Reserve Economic Data |
+| `EIA_API_KEY` | API key for U.S. Energy Information Administration |
+| `COMTRADE_API_KEY` | API key for UN Comtrade data |
+| `AISTREAM_API_KEY` | API key for AISStream vessel tracking |
+| `SEC_UA` | SEC-required User-Agent string for EDGAR requests |
 
 ## Operational Runbook
 
@@ -64,4 +69,19 @@ Configuration is read from `/etc/meridian/.env`.
 - **Logs**: `docker compose logs -f api`
 - **Restart**: `sudo systemctl restart meridian`
 - **Metrics**: Visit `/metrics` for Prometheus metrics.
+
+## Data Integration Hub
+
+Run database migrations and start the ingestion stack:
+
+```bash
+make migrate
+make up
+```
+
+Backfill a dataset over a time window:
+
+```bash
+python -m ingestion.scheduler.backfill --dataset rates.fred.us10y --start 2023-01-01 --end 2023-12-31
+```
 
