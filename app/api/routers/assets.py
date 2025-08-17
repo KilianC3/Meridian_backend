@@ -73,7 +73,8 @@ async def get_index_prices(
         "ORDER BY ts LIMIT %(limit)s OFFSET %(offset)s"
     )
     count_sql = (
-        "SELECT COUNT(*) as count FROM indices_eod WHERE index_symbol = %(index_symbol)s "
+        "SELECT COUNT(*) as count FROM indices_eod "
+        "WHERE index_symbol = %(index_symbol)s "
         "AND (%(start)s IS NULL OR ts >= %(start)s) "
         "AND (%(end)s IS NULL OR ts <= %(end)s)"
     )
@@ -142,9 +143,7 @@ async def get_earnings_events(
     end: datetime | None = None,
     page: Page = Depends(),
 ):
-    key = (
-        f"earnings:{cik}:{ticker}:{q}:{start}:{end}:{page.limit}:{page.offset}"
-    )
+    key = f"earnings:{cik}:{ticker}:{q}:{start}:{end}:{page.limit}:{page.offset}"
     cached = await cache.cache_get(key)
     if cached:
         if isinstance(cached, (bytes, str)):

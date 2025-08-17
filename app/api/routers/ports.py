@@ -30,7 +30,8 @@ async def get_port_series(
     page: Page = Depends(),
 ):
     key = (
-        f"port_series:{port_id}:{vessel_class.value}:{start}:{end}:{page.limit}:{page.offset}"
+        f"port_series:{port_id}:{vessel_class.value}:{start}:{end}:"
+        f"{page.limit}:{page.offset}"
     )
     cached = await cache.cache_get(key)
     if cached:
@@ -39,7 +40,8 @@ async def get_port_series(
         return cached
 
     sql = (
-        "SELECT port_id, vessel_class, ts, congestion, waiting_time, arrivals, departures "
+        "SELECT port_id, vessel_class, ts, congestion, waiting_time, "
+        "arrivals, departures "
         "FROM port_congestion_ts "
         "WHERE port_id = %(port_id)s "
         "AND (%(vessel_class)s = 'all' OR vessel_class = %(vessel_class)s) "
@@ -80,15 +82,18 @@ async def get_port_snapshot(port_id: str, vessel_class: VesselClass = VesselClas
 
     if vessel_class == VesselClass.all:
         sql = (
-            "SELECT DISTINCT ON (vessel_class) port_id, vessel_class, ts, congestion, waiting_time, arrivals, departures "
+            "SELECT DISTINCT ON (vessel_class) port_id, vessel_class, ts, "
+            "congestion, waiting_time, arrivals, departures "
             "FROM port_congestion_ts WHERE port_id = %(port_id)s "
             "ORDER BY vessel_class, ts DESC"
         )
         params = {"port_id": port_id}
     else:
         sql = (
-            "SELECT port_id, vessel_class, ts, congestion, waiting_time, arrivals, departures "
-            "FROM port_congestion_ts WHERE port_id = %(port_id)s AND vessel_class = %(vessel_class)s "
+            "SELECT port_id, vessel_class, ts, congestion, waiting_time, "
+            "arrivals, departures "
+            "FROM port_congestion_ts WHERE port_id = %(port_id)s "
+            "AND vessel_class = %(vessel_class)s "
             "ORDER BY ts DESC LIMIT 1"
         )
         params = {"port_id": port_id, "vessel_class": vessel_class.value}

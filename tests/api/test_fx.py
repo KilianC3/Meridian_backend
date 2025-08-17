@@ -13,11 +13,14 @@ client = TestClient(app)
 @patch("app.api.routers.fx.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.fx.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.fx.db.fetch_all", new_callable=MagicMock)
-def test_get_fx_series(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_fx_series(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
-    fetch_all.return_value = [
-        {"ts": "2024-01-01", "value": 1.1, "unit": "USD/EUR"}
-    ]
+    fetch_all.return_value = [{"ts": "2024-01-01", "value": 1.1, "unit": "USD/EUR"}]
     fetch_one.return_value = {"count": 1}
     resp = client.get(
         "/v1/fx",

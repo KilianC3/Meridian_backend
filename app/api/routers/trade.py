@@ -40,7 +40,8 @@ async def get_trade_flows(
         return cached
 
     sql = (
-        "SELECT reporter_iso2, partner_iso2, hs_code, flow, period, value_usd, quantity, quantity_unit "
+        "SELECT reporter_iso2, partner_iso2, hs_code, flow, period, value_usd, "
+        "quantity, quantity_unit "
         "FROM trade_flows "
         "WHERE reporter_iso2 = %(reporter)s "
         "AND (%(partner)s IS NULL OR partner_iso2 = %(partner)s) "

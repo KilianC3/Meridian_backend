@@ -13,7 +13,12 @@ client = TestClient(app)
 @patch("app.api.routers.cb.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.cb.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.cb.db.fetch_all", new_callable=MagicMock)
-def test_get_cb_statements(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_cb_statements(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {

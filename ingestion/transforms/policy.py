@@ -118,7 +118,9 @@ def map_bis_entity(records: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]
 
 
 # Backwards compatibility for older registry entries
-def transform(records: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]:  # pragma: no cover
+def transform(
+    records: Iterable[dict[str, Any]],
+) -> Iterator[dict[str, Any]]:  # pragma: no cover
     """Legacy wrapper that auto-detects record type."""
     for rec in records:
         src = str(rec.get("source", ""))

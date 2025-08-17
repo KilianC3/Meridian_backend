@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from app.core.config import settings
 
 try:  # pragma: no cover - optional dependency
-    import redis.asyncio as redis
+    import redis.asyncio as redis  # type: ignore[import]
 except Exception:  # pragma: no cover - fallback
     redis = None  # type: ignore
 

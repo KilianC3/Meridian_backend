@@ -13,7 +13,12 @@ client = TestClient(app)
 @patch("app.api.routers.trade.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.trade.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.trade.db.fetch_all", new_callable=MagicMock)
-def test_get_trade_flows(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_trade_flows(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {

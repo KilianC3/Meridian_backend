@@ -40,7 +40,11 @@ async def get_policy_events(
     end: datetime | None = None,
     page: Page = Depends(),
 ):
-    key = f"policy:{jurisdiction.value}:{source.value if source else None}:{q}:{start}:{end}:{page.limit}:{page.offset}"
+    key = (
+        f"policy:{jurisdiction.value}:"
+        f"{source.value if source else None}:"
+        f"{q}:{start}:{end}:{page.limit}:{page.offset}"
+    )
     cached = await cache.cache_get(key)
     if cached:
         if isinstance(cached, (bytes, str)):
@@ -48,7 +52,8 @@ async def get_policy_events(
         return cached
 
     sql = (
-        "SELECT event_id, jurisdiction, source, published_at, title, summary, url, topics "
+        "SELECT event_id, jurisdiction, source, published_at, title, summary, url, "
+        "topics "
         "FROM policy_events "
         "WHERE jurisdiction = %(jurisdiction)s "
         "AND (%(source)s IS NULL OR source = %(source)s) "

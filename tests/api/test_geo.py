@@ -13,7 +13,12 @@ client = TestClient(app)
 @patch("app.api.routers.geo.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.geo.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.geo.db.fetch_all", new_callable=MagicMock)
-def test_get_geo_events(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_geo_events(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {
@@ -34,11 +39,14 @@ def test_get_geo_events(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: A
 @patch("app.api.routers.geo.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.geo.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.geo.db.fetch_all", new_callable=MagicMock)
-def test_get_geo_mentions(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_geo_mentions(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
-    fetch_all.return_value = [
-        {"event_source_id": "1", "ts": "2024-01-01T00:00:00"}
-    ]
+    fetch_all.return_value = [{"event_source_id": "1", "ts": "2024-01-01T00:00:00"}]
     fetch_one.return_value = {"count": 1}
     resp = client.get("/v1/geo/mentions", params={"event_source_id": "1"})
     assert resp.status_code == 200

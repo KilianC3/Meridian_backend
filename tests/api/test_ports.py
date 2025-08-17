@@ -13,7 +13,12 @@ client = TestClient(app)
 @patch("app.api.routers.ports.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.ports.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.ports.db.fetch_all", new_callable=MagicMock)
-def test_get_port_series(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_port_series(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {
@@ -37,7 +42,9 @@ def test_get_port_series(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: 
 @patch("app.api.routers.ports.cache.cache_get", new_callable=AsyncMock)
 @patch("app.api.routers.ports.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.ports.db.fetch_all", new_callable=MagicMock)
-def test_get_port_snapshot(fetch_all: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_port_snapshot(
+    fetch_all: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {
@@ -60,7 +67,12 @@ def test_get_port_snapshot(fetch_all: MagicMock, cache_set: AsyncMock, cache_get
 @patch("app.api.routers.chokepoints.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.chokepoints.db.fetch_one", new_callable=MagicMock)
 @patch("app.api.routers.chokepoints.db.fetch_all", new_callable=MagicMock)
-def test_get_chokepoint_series(fetch_all: MagicMock, fetch_one: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_chokepoint_series(
+    fetch_all: MagicMock,
+    fetch_one: MagicMock,
+    cache_set: AsyncMock,
+    cache_get: AsyncMock,
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {
@@ -84,7 +96,9 @@ def test_get_chokepoint_series(fetch_all: MagicMock, fetch_one: MagicMock, cache
 @patch("app.api.routers.chokepoints.cache.cache_get", new_callable=AsyncMock)
 @patch("app.api.routers.chokepoints.cache.cache_set", new_callable=AsyncMock)
 @patch("app.api.routers.chokepoints.db.fetch_all", new_callable=MagicMock)
-def test_get_chokepoint_snapshot(fetch_all: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock) -> None:
+def test_get_chokepoint_snapshot(
+    fetch_all: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock
+) -> None:
     cache_get.return_value = None
     fetch_all.return_value = [
         {

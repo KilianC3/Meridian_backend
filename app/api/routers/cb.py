@@ -4,9 +4,8 @@ import json
 from datetime import datetime
 from enum import Enum
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.concurrency import run_in_threadpool
-from fastapi import Query
 
 from app.api.schemas.common import Page
 from app.core import cache, db
@@ -45,7 +44,8 @@ async def get_cb_statements(
         return cached
 
     sql = (
-        "SELECT statement_id, central_bank, type, published_at, title, url, hawkish_dovish_score "
+        "SELECT statement_id, central_bank, type, published_at, title, url, "
+        "hawkish_dovish_score "
         "FROM cb_statements "
         "WHERE central_bank = %(bank)s "
         "AND (%(type)s = 'any' OR type = %(type)s) "

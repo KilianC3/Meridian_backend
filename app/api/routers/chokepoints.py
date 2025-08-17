@@ -30,7 +30,8 @@ async def get_chokepoint_series(
     page: Page = Depends(),
 ):
     key = (
-        f"chokepoint_series:{chokepoint_id}:{vessel_class.value}:{start}:{end}:{page.limit}:{page.offset}"
+        f"chokepoint_series:{chokepoint_id}:{vessel_class.value}:"
+        f"{start}:{end}:{page.limit}:{page.offset}"
     )
     cached = await cache.cache_get(key)
     if cached:
@@ -82,7 +83,8 @@ async def get_chokepoint_snapshot(
 
     if vessel_class == VesselClass.all:
         sql = (
-            "SELECT DISTINCT ON (vessel_class) chokepoint_id, vessel_class, ts, delay_hours "
+            "SELECT DISTINCT ON (vessel_class) chokepoint_id, vessel_class, ts, "
+            "delay_hours "
             "FROM chokepoint_delay_ts WHERE chokepoint_id = %(chokepoint_id)s "
             "ORDER BY vessel_class, ts DESC"
         )
@@ -90,7 +92,8 @@ async def get_chokepoint_snapshot(
     else:
         sql = (
             "SELECT chokepoint_id, vessel_class, ts, delay_hours "
-            "FROM chokepoint_delay_ts WHERE chokepoint_id = %(chokepoint_id)s AND vessel_class = %(vessel_class)s "
+            "FROM chokepoint_delay_ts WHERE chokepoint_id = %(chokepoint_id)s "
+            "AND vessel_class = %(vessel_class)s "
             "ORDER BY ts DESC LIMIT 1"
         )
         params = {"chokepoint_id": chokepoint_id, "vessel_class": vessel_class.value}
