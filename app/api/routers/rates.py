@@ -1,0 +1,64 @@
+from __future__ import annotations
+
+import json
+from datetime import datetime
+from enum import Enum
+
+from fastapi import APIRouter, Depends
+from fastapi.concurrency import run_in_threadpool
+
+from app.api.schemas.common import Page
+from app.core import cache, db
+
+
+class RateSeries(str, Enum):
+    us_10y_yield = "us_10y_yield"
+    effr = "effr"
+    curve_10y_2y = "curve_10y_2y"
+    curve_10y_3m = "curve_10y_3m"
+
+
+router = APIRouter(tags=["rates"])
+
+
+@router.get("/rates")
+async def get_rates_series(
+    series: RateSeries,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    page: Page = Depends(),
+):
+    metric = series.value
+    key = f"rates:{metric}:{start}:{end}:{page.limit}:{page.offset}"
+    cached = await cache.cache_get(key)
+    if cached:
+        if isinstance(cached, (bytes, str)):
+            return json.loads(cached)
+        return cached
+
+    sql = (
+        "SELECT series_id, entity_id, metric, ts, value, unit, source "
+        "FROM metrics_ts "
+        "WHERE entity_id = 'US' AND metric = %(metric)s "
+        "AND (%(start)s IS NULL OR ts >= %(start)s) "
+        "AND (%(end)s IS NULL OR ts <= %(end)s) "
+        "ORDER BY ts LIMIT %(limit)s OFFSET %(offset)s"
+    )
+    count_sql = (
+        "SELECT COUNT(*) as count FROM metrics_ts "
+        "WHERE entity_id = 'US' AND metric = %(metric)s "
+        "AND (%(start)s IS NULL OR ts >= %(start)s) "
+        "AND (%(end)s IS NULL OR ts <= %(end)s)"
+    )
+    params = {
+        "metric": metric,
+        "start": start,
+        "end": end,
+        "limit": page.limit,
+        "offset": page.offset,
+    }
+    rows = await run_in_threadpool(db.fetch_all, sql, params)
+    count_row = await run_in_threadpool(db.fetch_one, count_sql, params)
+    resp = {"data": rows, "count": count_row.get("count", 0) if count_row else 0}
+    await cache.cache_set(key, json.dumps(resp))
+    return resp

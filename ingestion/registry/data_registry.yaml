@@ -1,3 +1,4 @@
+# Registry of ingestion datasets spanning central bank, policy, macro, logistics, geopolitics, commodities, and US assets.
 datasets:
   fed_rss:
     enabled: true
@@ -71,6 +72,51 @@ datasets:
     conflict_keys: [source, source_id]
     mapper: policy.map_bis_entity
 
+  eu_sanctions:
+    enabled: true
+    adapter: file_scraper
+    url: https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_sanction_update
+
+  uk_hmt_sanctions:
+    enabled: true
+    adapter: file_scraper
+    url: https://ofsistorage.blob.core.windows.net/publishlive/ConList.csv
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_sanction_update
+
+  un_sanctions:
+    enabled: true
+    adapter: file_scraper
+    url: https://scsanctions.un.org/consolidated
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_sanction_update
+
+  cbp_csms:
+    enabled: true
+    adapter: file_scraper
+    url: https://www.cbp.gov/trade/automated/cargo-systems-messaging-service-csms
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_policy_event
+
+  ustr_press:
+    enabled: true
+    adapter: file_scraper
+    url: https://ustr.gov/about-us/policy-offices/press-office/press-releases
+    cadence: daily
+    target_table: policy_events
+    conflict_keys: [source, source_id]
+    mapper: policy.map_policy_event
+
   world_bank:
     enabled: true
     adapter: rest_json
@@ -98,7 +144,34 @@ datasets:
     conflict_keys: [series_id, ts]
     mapper: macro.map_imf_ifs
 
+  bis_policy_rates:
+    enabled: true
+    adapter: file_scraper
+    url: https://www.bis.org/statistics/cbpol.csv
+    cadence: monthly
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_bis_policy_rate
+
   fred_rates:
+    enabled: true
+    adapter: rest_json
+    url: https://api.stlouisfed.org/fred/series/observations
+    cadence: daily
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_fred_series
+
+  fred_fx:
+    enabled: true
+    adapter: rest_json
+    url: https://api.stlouisfed.org/fred/series/observations
+    cadence: daily
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    mapper: macro.map_fred_series
+
+  fred_extras:
     enabled: true
     adapter: rest_json
     url: https://api.stlouisfed.org/fred/series/observations
@@ -111,6 +184,20 @@ datasets:
     enabled: true
     adapter: rest_json
     url: https://comtradeapi.worldbank.org/v1/get
+    cadence: monthly
+    target_table: trade_flows
+    conflict_keys:
+      - reporter_iso2
+      - partner_iso2
+      - hs_code
+      - flow
+      - period
+    mapper: logistics.map_trade_flow
+
+  us_census_trade:
+    enabled: true
+    adapter: rest_json
+    url: https://api.census.gov/data/timeseries/intltrade/exports/hs
     cadence: monthly
     target_table: trade_flows
     conflict_keys:
@@ -138,6 +225,24 @@ datasets:
     target_table: ais_raw
     conflict_keys: [msg_id]
     mapper: logistics.map_ais_raw
+
+  pca_advisories:
+    enabled: true
+    adapter: file_scraper
+    url: https://pancanal.com/en/advisories/
+    cadence: daily
+    target_table: geo_events
+    conflict_keys: [source, source_id]
+    mapper: logistics.map_pca_advisory
+
+  nws_alerts:
+    enabled: true
+    adapter: rest_json
+    url: https://api.weather.gov/alerts
+    cadence: hourly
+    target_table: geo_events
+    conflict_keys: [source, source_id]
+    mapper: logistics.map_nws_alert
 
   gdelt_events:
     enabled: true
