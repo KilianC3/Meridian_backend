@@ -7,9 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.deps import rate_limit
 from app.api.routers import auth, datasources, health, jobs, v1
+from app.core import cache, db
 from app.core.config import settings
-from app.core import db
-from app.core import cache
 from app.core.logging import configure_logging
 from app.core.telemetry import metrics_middleware
 from app.core.telemetry import router as telemetry_router

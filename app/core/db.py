@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Iterable
 
-from psycopg2.pool import SimpleConnectionPool
 from psycopg2.extras import RealDictCursor
+from psycopg2.pool import SimpleConnectionPool
 
 from app.core.config import settings
 

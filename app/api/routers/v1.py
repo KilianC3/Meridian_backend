@@ -3,17 +3,17 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from . import (
-    macro,
-    rates,
-    fx,
-    commodities,
-    policy,
-    cb,
-    geo,
-    trade,
-    ports,
-    chokepoints,
     assets,
+    cb,
+    chokepoints,
+    commodities,
+    fx,
+    geo,
+    macro,
+    policy,
+    ports,
+    rates,
+    trade,
 )
 
 router = APIRouter(prefix="/v1")
