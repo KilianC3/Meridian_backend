@@ -15,6 +15,7 @@ from . import (
     portfolio,
     ports,
     rates,
+    risk,
     trade,
     watchlist,
 )
@@ -34,3 +35,4 @@ router.include_router(assets.router)
 router.include_router(portfolio.router)
 router.include_router(watchlist.router)
 router.include_router(alerts.router)
+router.include_router(risk.router)
