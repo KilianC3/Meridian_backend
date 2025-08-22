@@ -21,7 +21,7 @@ def _get_conn():
 def test_update_density() -> None:
     conn = _get_conn()
     cur = conn.cursor()
-    cur.execute("DROP TABLE IF EXISTS news_mentions, factors")
+    cur.execute("DROP TABLE IF EXISTS news_mentions, factors CASCADE")
     cur.execute(
         """
         CREATE TABLE factors (
