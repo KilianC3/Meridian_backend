@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
@@ -21,6 +22,10 @@ class FakeRedis:
         self.store[key] = value
 
 
+@patch(
+    "app.api.routers.health.load_registry",
+    return_value={"datasets": {"dummy": {"cadence": "daily", "enabled": True}}},
+)
 @patch("app.db.redis.init_client", new_callable=AsyncMock)
 @patch("app.db.redis.ping", new_callable=AsyncMock, return_value=True)
 @patch("app.api.routers.health.mongo.ping", new_callable=AsyncMock, return_value=True)
@@ -30,12 +35,16 @@ def test_readiness_ok(
     mongo_ping: AsyncMock,
     redis_ping: AsyncMock,
     redis_client: AsyncMock,
+    load_registry: AsyncMock,  # noqa: ARG001
 ) -> None:  # noqa: ARG001
-    redis_client.return_value = FakeRedis()
+    fr = FakeRedis()
+    fr.store["ingest:dummy:ts"] = str(int(time.time()))
+    redis_client.return_value = fr
     response = client.get("/readiness")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
+    assert data["datasets"]["dummy"]["ok"] is True
 
 
 def test_healthz() -> None:
@@ -54,6 +63,10 @@ def test_version() -> None:
     }
 
 
+@patch(
+    "app.api.routers.health.load_registry",
+    return_value={"datasets": {"dummy": {"cadence": "daily", "enabled": True}}},
+)
 @patch("app.db.redis.init_client", new_callable=AsyncMock)
 @patch("app.db.redis.ping", side_effect=Exception("fail"))
 @patch("app.api.routers.health.mongo.ping", new_callable=AsyncMock, return_value=True)
@@ -63,6 +76,7 @@ def test_readiness_unhealthy(
     mongo_ping: AsyncMock,
     redis_ping: AsyncMock,
     redis_client: AsyncMock,
+    load_registry: AsyncMock,  # noqa: ARG001
 ) -> None:  # noqa: ARG001
     redis_client.return_value = FakeRedis()
     response = client.get("/readiness")

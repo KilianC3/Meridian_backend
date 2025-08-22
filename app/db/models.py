@@ -12,6 +12,8 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    Text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -175,3 +177,124 @@ class AlertEvent(Base):
     delivered: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     last_error: Mapped[str | None] = mapped_column(String, nullable=True)
+
+
+class Series(Base):
+    __tablename__ = "series"
+
+    series_id: Mapped[str] = mapped_column(String, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    unit: Mapped[str | None] = mapped_column(String, nullable=True)
+    frequency: Mapped[str | None] = mapped_column(String, nullable=True)
+    geography: Mapped[str | None] = mapped_column(String, nullable=True)
+    sector: Mapped[str | None] = mapped_column(String, nullable=True)
+    transform: Mapped[str | None] = mapped_column(String, nullable=True)
+    first_ts: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    last_ts: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+
+class Observation(Base):
+    __tablename__ = "observations"
+
+    series_id: Mapped[str] = mapped_column(
+        String, ForeignKey("series.series_id", ondelete="CASCADE"), primary_key=True
+    )
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
+    value: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+
+class Factor(Base):
+    __tablename__ = "factors"
+
+    factor_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    series_id: Mapped[str | None] = mapped_column(
+        String, ForeignKey("series.series_id")
+    )
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    evidence_density: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+
+class FactorEdge(Base):
+    __tablename__ = "factor_edges"
+
+    edge_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    src_factor: Mapped[int] = mapped_column(
+        Integer, ForeignKey("factors.factor_id", ondelete="CASCADE"), nullable=False
+    )
+    dst_factor: Mapped[int] = mapped_column(
+        Integer, ForeignKey("factors.factor_id", ondelete="CASCADE"), nullable=False
+    )
+    sign: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    lag_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    beta: Mapped[float | None] = mapped_column(Float, nullable=True)
+    p_value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    transfer_entropy: Mapped[float | None] = mapped_column(Float, nullable=True)
+    method: Mapped[str | None] = mapped_column(String, nullable=True)
+    regime: Mapped[str | None] = mapped_column(String, nullable=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    sample_start: Mapped[date | None] = mapped_column(Date, nullable=True)
+    sample_end: Mapped[date | None] = mapped_column(Date, nullable=True)
+    evidence_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    evidence_density: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+
+class EvidenceLink(Base):
+    __tablename__ = "evidence_links"
+
+    link_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    factor_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("factors.factor_id", ondelete="CASCADE"), nullable=True
+    )
+    edge_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("factor_edges.edge_id", ondelete="CASCADE"), nullable=True
+    )
+    mongo_doc_id: Mapped[str] = mapped_column(String, nullable=False)
+    weight: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+
+class NewsMention(Base):
+    __tablename__ = "news_mentions"
+
+    mention_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    factor_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("factors.factor_id", ondelete="SET NULL"), nullable=True
+    )
+    source: Mapped[str] = mapped_column(String, nullable=False)
+    source_id: Mapped[str] = mapped_column(String, nullable=False)
+    url: Mapped[str | None] = mapped_column(String, nullable=True)
+    title: Mapped[str | None] = mapped_column(String, nullable=True)
+    published_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    snippet: Mapped[str | None] = mapped_column(Text, nullable=True)
+    raw: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    __table_args__ = (UniqueConstraint("source", "source_id"),)
+
+
+class RiskMetric(Base):
+    __tablename__ = "risk_metrics"
+
+    entity_id: Mapped[str] = mapped_column(String, primary_key=True)
+    metric: Mapped[str] = mapped_column(String, primary_key=True)
+    value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.utcnow
+    )
+
+
+class RiskSnapshot(Base):
+    __tablename__ = "risk_snapshots"
+
+    factor_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("factors.factor_id", ondelete="CASCADE"), primary_key=True
+    )
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
+    node_vol: Mapped[float | None] = mapped_column(Float, nullable=True)
+    node_shock_sigma: Mapped[float | None] = mapped_column(Float, nullable=True)
+    impact_pct: Mapped[float | None] = mapped_column(Float, nullable=True)
+    systemic_contrib: Mapped[float | None] = mapped_column(Float, nullable=True)

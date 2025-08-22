@@ -5,6 +5,8 @@ from typing import Any, Iterator
 
 import feedparser
 
+from ingestion.transforms import news
+
 from .base import BaseAdapter
 
 
@@ -18,6 +20,7 @@ class RSSAdapter(BaseAdapter):
         feed = feedparser.parse(self.url)
         for entry in feed.entries:
             published = entry.get("published_parsed")
+            ts = None
             if published is not None:
                 year, month, day, hour, minute, second = published[:6]
                 ts = datetime(
@@ -25,7 +28,10 @@ class RSSAdapter(BaseAdapter):
                 )
                 if cursor and ts <= cursor:
                     continue
-            yield entry
+            item = dict(entry)
+            item["published_at"] = ts
+            item["source"] = self.url
+            yield item
 
     def transform(self, item: Any) -> Iterator[dict[str, Any]]:
-        return iter([item])
+        return news.transform([item])

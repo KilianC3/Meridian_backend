@@ -39,3 +39,24 @@ def test_get_risk_score(
         "risk": 0.24,
     }
     fetch_all.assert_called_once()
+
+
+@patch("app.api.routers.risk.cache.cache_get", new_callable=AsyncMock)
+@patch("app.api.routers.risk.cache.cache_set", new_callable=AsyncMock)
+@patch("app.api.routers.risk.db.fetch_all", new_callable=MagicMock)
+def test_get_risk_score_defaults(
+    fetch_all: MagicMock, cache_set: AsyncMock, cache_get: AsyncMock
+) -> None:
+    cache_get.return_value = None
+    fetch_all.return_value = []
+    resp = client.get("/v1/risk", params={"country": "USA"})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["risk"] == 0.0
+    assert body["scores"] == {
+        "macro": 0.0,
+        "market": 0.0,
+        "commodity": 0.0,
+        "geo": 0.0,
+        "logistics": 0.0,
+    }
