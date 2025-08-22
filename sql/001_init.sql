@@ -37,6 +37,90 @@ CREATE TABLE IF NOT EXISTS metrics_ts (
     PRIMARY KEY (series_id, ts)
 );
 
+CREATE TABLE IF NOT EXISTS series (
+    series_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    unit TEXT,
+    frequency TEXT,
+    geography TEXT,
+    sector TEXT,
+    transform TEXT,
+    first_ts TIMESTAMPTZ,
+    last_ts TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS observations (
+    series_id TEXT NOT NULL REFERENCES series(series_id) ON DELETE CASCADE,
+    ts TIMESTAMPTZ NOT NULL,
+    value DOUBLE PRECISION,
+    PRIMARY KEY (series_id, ts)
+);
+
+CREATE TABLE IF NOT EXISTS factors (
+    factor_id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    series_id TEXT REFERENCES series(series_id),
+    note TEXT,
+    evidence_density DOUBLE PRECISION
+);
+
+CREATE TABLE IF NOT EXISTS factor_edges (
+    edge_id SERIAL PRIMARY KEY,
+    src_factor INT NOT NULL REFERENCES factors(factor_id) ON DELETE CASCADE,
+    dst_factor INT NOT NULL REFERENCES factors(factor_id) ON DELETE CASCADE,
+    sign INT,
+    lag_days INT,
+    beta DOUBLE PRECISION,
+    p_value DOUBLE PRECISION,
+    transfer_entropy DOUBLE PRECISION,
+    method TEXT,
+    regime TEXT,
+    confidence DOUBLE PRECISION,
+    sample_start DATE,
+    sample_end DATE,
+    evidence_count INT,
+    evidence_density DOUBLE PRECISION
+);
+
+CREATE TABLE IF NOT EXISTS evidence_links (
+    link_id SERIAL PRIMARY KEY,
+    factor_id INT REFERENCES factors(factor_id) ON DELETE CASCADE,
+    edge_id INT REFERENCES factor_edges(edge_id) ON DELETE CASCADE,
+    mongo_doc_id TEXT NOT NULL,
+    weight DOUBLE PRECISION
+);
+
+CREATE TABLE IF NOT EXISTS news_mentions (
+    mention_id SERIAL PRIMARY KEY,
+    factor_id INT REFERENCES factors(factor_id) ON DELETE SET NULL,
+    source TEXT NOT NULL,
+    source_id TEXT NOT NULL,
+    url TEXT,
+    title TEXT,
+    published_at TIMESTAMPTZ,
+    snippet TEXT,
+    raw JSONB,
+    UNIQUE (source, source_id)
+);
+
+CREATE TABLE IF NOT EXISTS risk_metrics (
+    entity_id TEXT NOT NULL,
+    metric TEXT NOT NULL,
+    value DOUBLE PRECISION,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (entity_id, metric)
+);
+
+CREATE TABLE IF NOT EXISTS risk_snapshots (
+    factor_id INT NOT NULL REFERENCES factors(factor_id) ON DELETE CASCADE,
+    ts TIMESTAMPTZ NOT NULL,
+    node_vol DOUBLE PRECISION,
+    node_shock_sigma DOUBLE PRECISION,
+    impact_pct DOUBLE PRECISION,
+    systemic_contrib DOUBLE PRECISION,
+    PRIMARY KEY (factor_id, ts)
+);
+
 CREATE TABLE IF NOT EXISTS prices_eod (
     symbol TEXT NOT NULL,
     ts DATE NOT NULL,
@@ -292,3 +376,33 @@ CREATE TABLE IF NOT EXISTS earnings_events (
     url TEXT,
     raw JSONB
 );
+
+-- Seed reference data
+INSERT INTO ref_ports (port_id, name, country_iso2) VALUES
+    (1, 'Port of Shanghai', 'CN'),
+    (2, 'Port of Singapore', 'SG')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO ref_chokepoints (chokepoint_id, name, notes) VALUES
+    (1, 'Suez Canal', NULL),
+    (2, 'Panama Canal', NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO ref_company_tickers (cik, ticker, title, exchange, lei, sector_code, updated_at) VALUES
+    ('0000320193', 'AAPL', 'Apple Inc.', 'NASDAQ', NULL, NULL, NOW()),
+    ('0000789019', 'MSFT', 'Microsoft Corp.', 'NASDAQ', NULL, NULL, NOW())
+ON CONFLICT (cik) DO NOTHING;
+
+-- Seed sample factor web
+INSERT INTO factors (factor_id, name, series_id, note, evidence_density) VALUES
+    (1, 'Oil Prices', NULL, NULL, 0.0),
+    (2, 'Inflation', NULL, NULL, 0.0)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO factor_edges (edge_id, src_factor, dst_factor, sign, lag_days, beta, confidence, evidence_count, evidence_density)
+VALUES (1, 1, 2, 1, 30, 0.8, 1.0, 1, 0.0)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO evidence_links (factor_id, edge_id, mongo_doc_id, weight)
+VALUES (1, NULL, 'sample_doc', 1.0)
+ON CONFLICT DO NOTHING;

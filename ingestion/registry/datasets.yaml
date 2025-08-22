@@ -1,0 +1,61 @@
+datasets:
+  rates.fred.us10y:
+    name: "US 10-Year Treasury Yield"
+    cadence: daily
+    adapter: ingestion.adapters.fred.FREDAdapter
+    transform: ingestion.transforms.markets.transform
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    enabled: true
+    records: []
+
+  macro.worldbank.cpi:
+    name: "Consumer Price Inflation"
+    cadence: monthly
+    adapter: ingestion.adapters.worldbank.WorldBankAdapter
+    transform: ingestion.transforms.macro.transform
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    enabled: true
+    records: []
+
+  macro.worldbank.unemployment:
+    name: "Unemployment Rate"
+    cadence: monthly
+    adapter: ingestion.adapters.worldbank.WorldBankAdapter
+    transform: ingestion.transforms.macro.transform
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    enabled: true
+    records: []
+
+  macro.imf.fx_reserves:
+    name: "Foreign Exchange Reserves"
+    cadence: monthly
+    adapter: ingestion.adapters.worldbank.WorldBankAdapter
+    transform: ingestion.transforms.macro.transform
+    target_table: metrics_ts
+    conflict_keys: [series_id, ts]
+    enabled: true
+    records: []
+
+    logistics.ais.throughput:
+      name: "Global Shipping Throughput"
+      cadence: hourly
+      adapter: ingestion.adapters.aisstream.AISStreamAdapter
+      transform: ingestion.transforms.logistics.transform
+      target_table: ais_raw
+      conflict_keys: [msg_id]
+      enabled: false
+      messages: []
+
+    news.sample.rss:
+      name: "Sample News Feed"
+      cadence: daily
+      adapter: ingestion.adapters.rss.RSSAdapter
+      transform: ingestion.transforms.news.transform
+      target_table: news_mentions
+      conflict_keys: [mention_id]
+      enabled: false
+      url: https://example.com/rss
+

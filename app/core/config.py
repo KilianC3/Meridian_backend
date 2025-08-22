@@ -22,6 +22,15 @@ class Settings(BaseSettings):  # type: ignore[misc]
     readiness_cache_ttl: int = Field(5, alias="READINESS_CACHE_TTL")
     cors_origins: list[str] = Field(default=["*"], alias="CORS_ORIGINS")
 
+    # Risk engine configuration
+    risk_window_days: int = Field(30, alias="RISK_WINDOW_DAYS")
+    max_lag_days: int = Field(180, alias="MAX_LAG_DAYS")
+    default_shock_sigma: float = Field(1.0, alias="DEFAULT_SHOCK_SIGMA")
+
+    # Optional vector store for evidence embeddings
+    vector_store_url: str | None = Field(None, alias="VECTOR_STORE_URL")
+    vector_store_api_key: str | None = Field(None, alias="VECTOR_STORE_API_KEY")
+
     class Config:
         env_file = ".env"
 

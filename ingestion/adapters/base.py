@@ -33,7 +33,7 @@ class BaseAdapter(ABC):
         cur.execute(
             "INSERT INTO ingestion_runs (dataset_id, started_at, status) "
             "VALUES (%s, %s, %s) RETURNING run_id",
-            (None, started, "running"),
+            (getattr(self, "dataset_id", None), started, "running"),
         )
         run_id = cur.fetchone()[0]
         ingested = 0

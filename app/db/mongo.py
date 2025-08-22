@@ -26,3 +26,10 @@ async def ping() -> bool:
         except Exception:
             await asyncio.sleep(0.1)
     return False
+
+
+async def save_document(doc: dict[str, Any]) -> str:
+    """Store a document in MongoDB and return its ID."""
+    cl = await init_client()
+    result = await cl.meridian.documents.insert_one(doc)
+    return str(result.inserted_id)
